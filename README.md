@@ -7,6 +7,10 @@ It monitors soil moisture and air temperature/humidity (DHT11), waters the plant
 
 *Live dashboard served by the Pi at http://planto.local (shown here with simulated readings).*
 
+<img src="docs/plant.jpg" alt="Peace lily with the soil moisture probe in the pot" width="360">
+
+*The first Planto plant: a peace lily with the soil moisture probe in its pot.*
+
 ## Hardware
 
 KiCad 9 project: [`planto/plant/`](planto/plant/) — a Pi 5 HAT that sits on the 40-pin header.

@@ -7,37 +7,15 @@ defmodule Planto.Application do
 
   @impl true
   def start(_type, _args) do
-    children =
-      [
-        # Children for all targets
-        # Starts a worker by calling: Planto.Worker.start_link(arg)
-        # {Planto.Worker, arg},
-      ] ++ target_children()
+    cfg = Application.get_all_env(:planto)
 
-    # See https://elixir.hexdocs.pm/Supervisor.html
-    # for other strategies and supported options
+    children = [
+      {Planto.Store, max_entries: cfg[:history_size]},
+      {Planto.Sampler, backend: cfg[:sensor_backend], interval_ms: cfg[:sample_interval_ms]},
+      {Bandit, plug: Planto.Web.Router, port: cfg[:web_port]}
+    ]
+
     opts = [strategy: :one_for_one, name: Planto.Supervisor]
     Supervisor.start_link(children, opts)
-  end
-
-  # List all child processes to be supervised
-  if Mix.target() == :host do
-    defp target_children() do
-      [
-        # Children that only run on the host during development or test.
-        # In general, prefer using `config/host.exs` for differences.
-        #
-        # Starts a worker by calling: Host.Worker.start_link(arg)
-        # {Host.Worker, arg},
-      ]
-    end
-  else
-    defp target_children() do
-      [
-        # Children for all targets except host
-        # Starts a worker by calling: Target.Worker.start_link(arg)
-        # {Target.Worker, arg},
-      ]
-    end
   end
 end

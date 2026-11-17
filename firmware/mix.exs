@@ -35,11 +35,14 @@ defmodule Planto.MixProject do
     [
       # Dependencies for all targets
       {:nerves, "~> 1.13", runtime: false},
-
       {:shoehorn, "~> 0.9.1"},
       {:logger_backends, "~> 1.0"},
       {:ring_logger, "~> 0.11.0"},
       {:toolshed, "~> 0.5.0"},
+      {:circuits_i2c, "~> 2.1"},
+      {:circuits_gpio, "~> 2.1"},
+      {:bandit, "~> 1.6"},
+      {:plug, "~> 1.16"},
 
       # Allow Nerves.Runtime on host to support development, testing and CI.
       # See config/host.exs for usage.

@@ -19,3 +19,9 @@ config :nerves_runtime,
        "a.nerves_fw_platform" => "host",
        "a.nerves_fw_version" => "0.0.0"
      }}
+
+# On the laptop, use simulated sensors and serve the dashboard on port 4000.
+config :planto,
+  sensor_backend: Planto.Sensors.Simulated,
+  sample_interval_ms: 5_000,
+  web_port: if(config_env() == :test, do: 4002, else: 4000)

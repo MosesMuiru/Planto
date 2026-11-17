@@ -8,7 +8,7 @@
 		(title "Planto - Pi 5 Smart Planter HAT")
 		(date "2026-11-17")
 		(rev "A")
-		(comment 1 "Soil moisture (ADS1115) + pump driver + status LED")
+		(comment 1 "Soil moisture (ADS1115) + DHT11 + pump driver + status LED")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x20_Odd_Even"
@@ -3201,6 +3201,177 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic:Conn_01x03"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x03"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x03_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -3.81)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_02x20_Odd_Even")
@@ -5540,10 +5711,6 @@
 		(uuid "a01cf31d-3266-4692-8c09-13834029d5fc")
 	)
 	(no_connect
-		(at 45.72 86.36)
-		(uuid "ff921a82-8dc9-4ef1-948a-191c727a2557")
-	)
-	(no_connect
 		(at 45.72 101.6)
 		(uuid "afedb2b9-9cee-4a36-92fa-82dad8561cb9")
 	)
@@ -5623,7 +5790,7 @@
 		(at 58.419999999999995 127.0)
 		(uuid "ace791e8-2845-402a-ba41-a8f83decbb4f")
 	)
-	(text "PLANTO - Raspberry Pi 5 smart planter HAT\nI2C: GPIO2 SDA / GPIO3 SCL -> ADS1115 @ 0x48 (ADDR=GND), AIN0 = soil AO\nGPIO17 (pin 11) SENSOR_PWR_N  - LOW = sensor powered (P-FET Q1), pull-up keeps it off at boot\nGPIO27 (pin 13) SENSOR_DO     - LM393 wet/dry threshold output\nGPIO22 (pin 15) PUMP_EN       - HIGH = pump on (5V, N-FET Q2, D1 flyback)\nGPIO23 (pin 16) STATUS_LED    - HIGH = LED on\nGPIO24 (pin 18) ADC_ALERT     - ADS1115 ALERT/RDY (open-drain, R1 pull-up)\nSensor J2: 1 VCC  2 GND  3 DO  4 AO  (FC-28/YL-69 + LM393 module)\nCamera: Pi 5 CSI connector directly (not on this board)"
+	(text "PLANTO - Raspberry Pi 5 smart planter HAT\nI2C: GPIO2 SDA / GPIO3 SCL -> ADS1115 @ 0x48 (ADDR=GND), AIN0 = soil AO\nGPIO4  (pin 7)  DHT_DATA      - DHT11 temp/humidity (J4: 1 VCC 2 DATA 3 GND), R7 10k pull-up\nGPIO17 (pin 11) SENSOR_PWR_N  - LOW = sensor powered (P-FET Q1), pull-up keeps it off at boot\nGPIO27 (pin 13) SENSOR_DO     - LM393 wet/dry threshold output\nGPIO22 (pin 15) PUMP_EN       - HIGH = pump on (5V, N-FET Q2, D1 flyback)\nGPIO23 (pin 16) STATUS_LED    - HIGH = LED on\nGPIO24 (pin 18) ADC_ALERT     - ADS1115 ALERT/RDY (open-drain, R1 pull-up)\nSensor J2: 1 VCC  2 GND  3 DO  4 AO  (FC-28/YL-69 + LM393 module)\nCamera: Pi 5 CSI connector directly (not on this board)"
 		(exclude_from_sim no)
 		(at 20.32 50.8 0)
 		(effects
@@ -5653,6 +5820,322 @@
 			(justify left bottom)
 		)
 		(uuid "58e24a0d-b1b2-44f0-a362-61c28baf7b27")
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x03")
+		(at 172.72 167.64 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "5061f6ce-7f84-4c97-94f8-f96e4f1d615f")
+		(property "Reference" "J4"
+			(at 172.72 162.56 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "DHT11"
+			(at 172.72 172.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
+			(at 172.72 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 172.72 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 172.72 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1a528bf6-0b08-46b5-913d-42607573b596")
+		)
+		(pin "2"
+			(uuid "2e712c4e-a683-4b52-a64a-34a134575dd2")
+		)
+		(pin "3"
+			(uuid "0e2f6706-1d4a-4113-a545-7fda43ce23d6")
+		)
+		(instances
+			(project "plant"
+				(path "/558434d3-cfe2-4d09-b542-fbc1862bc67b"
+					(reference "J4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 147.32 162.56 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3376bb7f-8d66-48b0-9212-a98cf6e175c7")
+		(property "Reference" "R7"
+			(at 144.78 162.56 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 149.86 162.56 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 145.542 162.56 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 147.32 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 147.32 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7a0ceb08-6fd5-4d36-8b3d-2c22acdd54bc")
+		)
+		(pin "2"
+			(uuid "ca2c8b76-1995-42c8-8a87-eac76adf83ce")
+		)
+		(instances
+			(project "plant"
+				(path "/558434d3-cfe2-4d09-b542-fbc1862bc67b"
+					(reference "R7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 129.54 167.64 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b1aec308-8dba-499a-af57-ae3625a26077")
+		(property "Reference" "C4"
+			(at 127.0 167.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100nF"
+			(at 132.08 167.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 130.505 163.83 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 129.54 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 129.54 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "afc3dc85-2780-4937-a04a-627c2ac878e5")
+		)
+		(pin "2"
+			(uuid "abac1581-ad83-47d0-8bd9-c80ee13f1014")
+		)
+		(instances
+			(project "plant"
+				(path "/558434d3-cfe2-4d09-b542-fbc1862bc67b"
+					(reference "C4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "+3V3"
+		(at 167.64 165.1 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "7c0f662c-7a94-4f45-a04e-ce964fa11cdb")
+	)
+	(label "DHT_DATA"
+		(at 167.64 167.64 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "6f7e5a81-42aa-4425-8735-cf30ae959775")
+	)
+	(label "GND"
+		(at 167.64 170.17999999999998 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a9f9d72b-cba2-4489-a8a5-2c57f16c94bf")
+	)
+	(label "+3V3"
+		(at 147.32 158.75 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "30f7fd63-bf40-4858-904d-e5901f0cae9e")
+	)
+	(label "DHT_DATA"
+		(at 147.32 166.37 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "ed4ae801-7ad4-43ed-831b-f5b421cf3ef2")
+	)
+	(label "+3V3"
+		(at 129.54 163.82999999999998 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3d53baa0-355f-4296-896a-8f4e0fac02b4")
+	)
+	(label "GND"
+		(at 129.54 171.45 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "7adec5de-23e7-4bf1-97df-d4041c3b3011")
+	)
+	(label "DHT_DATA"
+		(at 45.72 86.36 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "fc8703e8-f1bb-4309-956b-92c6af87bebd")
 	)
 	(sheet_instances
 		(path "/"

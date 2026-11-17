@@ -18,6 +18,18 @@ config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 
 config :nerves, source_date_epoch: "1794924278"
 
+# Planto sensor settings (shared by host and target).
+config :planto,
+  sample_interval_ms: 30_000,
+  # 24 h of history at one reading every 30 s
+  history_size: 2880,
+  i2c_bus: "i2c-1",
+  adc_address: 0x48,
+  pins: [soil_power: "GPIO17", soil_do: "GPIO27", dht: "GPIO4"],
+  # Soil sensor calibration in millivolts at 3.3 V supply. Measure your own:
+  # dry_mv = probe in dry soil/air, wet_mv = probe in water.
+  soil_calibration: [dry_mv: 3200, wet_mv: 900]
+
 if Mix.target() == :host do
   import_config "host.exs"
 else

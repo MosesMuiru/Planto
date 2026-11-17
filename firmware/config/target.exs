@@ -50,6 +50,23 @@ config :nerves_ssh,
 # Update regulatory_domain to your 2-letter country code E.g., "US"
 #
 # See https://github.com/nerves-networking/vintage_net for more information
+# Wi-Fi is set at build time from the environment so the password is never
+# stored in git:  NERVES_WIFI_SSID=... NERVES_WIFI_PSK=... mix firmware
+wlan0_config =
+  case System.get_env("NERVES_WIFI_SSID") do
+    ssid when ssid in [nil, ""] ->
+      %{type: VintageNetWiFi}
+
+    ssid ->
+      %{
+        type: VintageNetWiFi,
+        vintage_net_wifi: %{
+          networks: [%{key_mgmt: :wpa_psk, ssid: ssid, psk: System.get_env("NERVES_WIFI_PSK")}]
+        },
+        ipv4: %{method: :dhcp}
+      }
+  end
+
 config :vintage_net,
   regulatory_domain: "00",
   config: [
@@ -59,7 +76,7 @@ config :vintage_net,
        type: VintageNetEthernet,
        ipv4: %{method: :dhcp}
      }},
-    {"wlan0", %{type: VintageNetWiFi}}
+    {"wlan0", wlan0_config}
   ]
 
 config :mdns_lite,
@@ -71,11 +88,16 @@ config :mdns_lite,
   # because otherwise any of the devices may respond to nerves.local leading to
   # unpredictable behavior.
 
-  hosts: [:hostname, "nerves"],
+  hosts: [:hostname, "planto"],
   ttl: 120,
 
   # Advertise the following services over mDNS.
   services: [
+    %{
+      protocol: "http",
+      transport: "tcp",
+      port: 80
+    },
     %{
       protocol: "ssh",
       transport: "tcp",
@@ -98,3 +120,8 @@ config :mdns_lite,
 # Uncomment to use target specific configurations
 
 # import_config "#{Mix.target()}.exs"
+
+# Real sensors on the Pi; dashboard on http://planto.local
+config :planto,
+  sensor_backend: Planto.Sensors.Hardware,
+  web_port: 80

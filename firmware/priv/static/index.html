@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planto</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f4f3ef;
+    --surface-1: #fcfcfb;
+    --border: #e2e0d9;
+    --grid: #ebe9e3;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7973;
+    --series-1: #2a78d6;
+    --good: #0b7a3e;
+    --good-bg: #e3f3e9;
+    --warning: #8a5a00;
+    --warning-bg: #fdf1d6;
+    --critical: #b42318;
+    --critical-bg: #fde7e5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-0: #111110;
+      --surface-1: #1a1a19;
+      --border: #2e2d2b;
+      --grid: #262624;
+      --text-primary: #f0efec;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e86;
+      --series-1: #3987e5;
+      --good: #4fc27f;
+      --good-bg: #15291d;
+      --warning: #e6b450;
+      --warning-bg: #2d2412;
+      --critical: #f07a70;
+      --critical-bg: #331917;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --border: #2e2d2b;
+    --grid: #262624;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --series-1: #3987e5;
+    --good: #4fc27f;
+    --good-bg: #15291d;
+    --warning: #e6b450;
+    --warning-bg: #2d2412;
+    --critical: #f07a70;
+    --critical-bg: #331917;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -0.01em; }
+  h1 span { color: var(--text-muted); font-weight: 400; font-size: 15px; margin-left: 8px; }
+  .updated { color: var(--text-secondary); font-size: 13px; }
+  button {
+    font: inherit; font-size: 13px; color: var(--text-primary);
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  }
+  button:hover { border-color: var(--text-muted); }
+  button[aria-pressed="true"] { background: var(--text-primary); color: var(--surface-1); border-color: var(--text-primary); }
+  .banner { margin-top: 16px; padding: 10px 14px; border-radius: 10px; font-size: 14px; display: none; }
+  .banner.show { display: block; }
+  .banner.critical { background: var(--critical-bg); color: var(--critical); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 20px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .tile .label { color: var(--text-secondary); font-size: 13px; }
+  .tile .value { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .tile .value small { font-size: 15px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
+  .tile .sub { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-top: 8px; }
+  .status.good { color: var(--good); background: var(--good-bg); }
+  .status.warning { color: var(--warning); background: var(--warning-bg); }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 28px; }
+  .controls .spacer { flex: 1; }
+  .charts { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
+  @media (min-width: 900px) { .charts { grid-template-columns: 1fr 1fr; } .charts .wide { grid-column: 1 / -1; } }
+  .chart { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px 8px; position: relative; }
+  .chart h2 { margin: 0; font-size: 15px; font-weight: 600; }
+  .chart .unit { color: var(--text-muted); font-weight: 400; }
+  .chart svg { display: block; width: 100%; height: 200px; margin-top: 6px; touch-action: pan-y; }
+  .chart .empty { color: var(--text-muted); font-size: 13px; padding: 70px 0; text-align: center; }
+  .axis text { fill: var(--text-muted); font-size: 11px; }
+  .gridline { stroke: var(--grid); stroke-width: 1; }
+  .line { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .area { fill: var(--series-1); opacity: 0.08; }
+  .crosshair { stroke: var(--text-muted); stroke-width: 1; }
+  .dot { fill: var(--series-1); stroke: var(--surface-1); stroke-width: 2; }
+  .tooltip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); white-space: nowrap;
+  }
+  .tooltip strong { display: block; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .tooltip span { color: var(--text-secondary); }
+  details { margin-top: 20px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  .table-wrap { overflow-x: auto; margin-top: 10px; max-height: 360px; overflow-y: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-secondary); font-weight: 500; position: sticky; top: 0; background: var(--surface-1); }
+  footer { margin-top: 24px; color: var(--text-muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Planto<span>smart planter</span></h1>
+    <div class="updated" id="updated">Waiting for the first reading…</div>
+  </header>
+
+  <div class="banner critical" id="errors" role="alert"></div>
+
+  <section class="tiles" aria-label="Current readings">
+    <div class="tile">
+      <div class="label">Soil moisture</div>
+      <div class="value" id="soil-pct">–</div>
+      <div id="soil-status"></div>
+    </div>
+    <div class="tile">
+      <div class="label">Soil sensor voltage</div>
+      <div class="value" id="soil-mv">–</div>
+      <div class="sub">Higher = drier</div>
+    </div>
+    <div class="tile">
+      <div class="label">Temperature</div>
+      <div class="value" id="temp">–</div>
+      <div class="sub">DHT11</div>
+    </div>
+    <div class="tile">
+      <div class="label">Air humidity</div>
+      <div class="value" id="hum">–</div>
+      <div class="sub">DHT11</div>
+    </div>
+  </section>
+
+  <div class="controls" role="group" aria-label="Time range">
+    <button data-hours="1" aria-pressed="false">1 h</button>
+    <button data-hours="6" aria-pressed="false">6 h</button>
+    <button data-hours="24" aria-pressed="true">24 h</button>
+    <span class="spacer"></span>
+    <button id="sample-now">Read now</button>
+  </div>
+
+  <section class="charts">
+    <div class="chart wide" data-field="soil_percent" data-unit="%" data-min="0" data-max="100">
+      <h2>Soil moisture <span class="unit">%</span></h2>
+    </div>
+    <div class="chart" data-field="temperature_c" data-unit="°C">
+      <h2>Temperature <span class="unit">°C</span></h2>
+    </div>
+    <div class="chart" data-field="humidity" data-unit="%" data-min="0" data-max="100">
+      <h2>Air humidity <span class="unit">%</span></h2>
+    </div>
+  </section>
+
+  <details>
+    <summary>Readings table</summary>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Soil %</th><th>Soil mV</th><th>Wet pin</th><th>Temp °C</th><th>Humidity %</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <footer>Updates every few seconds. History is kept in memory on the Pi and clears when it restarts.</footer>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  let hours = 24;
+  let readings = [];
+  const SVGNS = "http://www.w3.org/2000/svg";
+
+  const fmtFull = (ms) => new Date(ms).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const num = (v, d = 0) => (v === null || v === undefined ? "–" : Number(v).toFixed(d));
+
+  function el(tag, attrs = {}, parent) {
+    const node = document.createElementNS(SVGNS, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+
+  function setValue(id, value, unit) {
+    const node = $(id);
+    node.textContent = value;
+    if (unit && value !== "–") {
+      const s = document.createElement("small");
+      s.textContent = unit;
+      node.appendChild(s);
+    }
+  }
+
+  function renderTiles(r) {
+    if (!r) return;
+    setValue("soil-pct", num(r.soil_percent), "%");
+    setValue("soil-mv", num(r.soil_mv), " mV");
+    setValue("temp", num(r.temperature_c, 1), "°C");
+    setValue("hum", num(r.humidity, 0), "%");
+
+    const status = $("soil-status");
+    status.textContent = "";
+    if (r.soil_wet !== null && r.soil_wet !== undefined) {
+      const badge = document.createElement("span");
+      badge.className = "status " + (r.soil_wet ? "good" : "warning");
+      badge.textContent = r.soil_wet ? "✓ Moist enough" : "⚠ Needs water";
+      status.appendChild(badge);
+    }
+
+    $("updated").textContent = "Last reading " + fmtFull(r.at);
+
+    const errors = $("errors");
+    if (r.errors && r.errors.length) {
+      errors.textContent = "Sensor problem: " + r.errors.join(" · ");
+      errors.classList.add("show");
+    } else {
+      errors.classList.remove("show");
+    }
+  }
+
+  function niceRange(min, max, fixedMin, fixedMax) {
+    if (fixedMin !== undefined && fixedMax !== undefined) return [fixedMin, fixedMax];
+    if (min === max) { min -= 1; max += 1; }
+    const pad = (max - min) * 0.15;
+    return [Math.floor(min - pad), Math.ceil(max + pad)];
+  }
+
+  function renderChart(box) {
+    const field = box.dataset.field;
+    const unit = box.dataset.unit;
+    box.querySelectorAll("svg, .empty, .tooltip").forEach((n) => n.remove());
+
+    const pts = readings.filter((r) => r[field] !== null && r[field] !== undefined);
+    if (pts.length < 2) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = pts.length ? "Collecting data…" : "No data from this sensor yet";
+      box.appendChild(empty);
+      return;
+    }
+
+    const W = Math.max(box.clientWidth - 32, 280), H = 200;
+    const m = { top: 10, right: 12, bottom: 24, left: 40 };
+    const iw = W - m.left - m.right, ih = H - m.top - m.bottom;
+
+    const now = Date.now();
+    // Fit the axis to the data until a full window of history exists.
+    const x0 = Math.max(pts[0].at, now - hours * 3600e3), x1 = Math.max(pts[pts.length - 1].at, now);
+    const short = x1 - x0 < 15 * 60e3;
+    const tickLabel = (ms) => new Date(ms).toLocaleTimeString([], short ? { hour: "2-digit", minute: "2-digit", second: "2-digit" } : { hour: "2-digit", minute: "2-digit" });
+    const vals = pts.map((p) => p[field]);
+    const fMin = box.dataset.min !== undefined ? Number(box.dataset.min) : undefined;
+    const fMax = box.dataset.max !== undefined ? Number(box.dataset.max) : undefined;
+    const [y0, y1] = niceRange(Math.min(...vals), Math.max(...vals), fMin, fMax);
+
+    const sx = (t) => m.left + ((t - x0) / (x1 - x0)) * iw;
+    const sy = (v) => m.top + ih - ((v - y0) / (y1 - y0)) * ih;
+
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": box.querySelector("h2").textContent + " over the last " + hours + " h" });
+    svg.style.height = H + "px";
+
+    const axis = el("g", { class: "axis" }, svg);
+    for (let i = 0; i <= 4; i++) {
+      const v = y0 + ((y1 - y0) * i) / 4;
+      const y = sy(v);
+      el("line", { class: "gridline", x1: m.left, x2: W - m.right, y1: y, y2: y }, axis);
+      const t = el("text", { x: m.left - 6, y: y + 4, "text-anchor": "end" }, axis);
+      t.textContent = Math.round(v);
+    }
+    for (let i = 0; i <= 4; i++) {
+      const t = x0 + ((x1 - x0) * i) / 4;
+      const label = el("text", { x: sx(t), y: H - 6, "text-anchor": i === 0 ? "start" : i === 4 ? "end" : "middle" }, axis);
+      label.textContent = tickLabel(t);
+    }
+
+    // Break the line where readings are missing (gap > 3 intervals).
+    const gap = Math.max(3 * (window.__intervalMs || 30000), 90000);
+    let d = "", area = "", segStart = null, prev = null;
+    const closeArea = () => { if (segStart !== null) area += `L${sx(prev.at)},${sy(y0)}L${sx(segStart)},${sy(y0)}Z`; };
+    for (const p of pts) {
+      const cmd = !prev || p.at - prev.at > gap ? "M" : "L";
+      if (cmd === "M") { closeArea(); segStart = p.at; area += `M${sx(p.at)},${sy(p[field])}`; }
+      else area += `L${sx(p.at)},${sy(p[field])}`;
+      d += `${cmd}${sx(p.at).toFixed(1)},${sy(p[field]).toFixed(1)}`;
+      prev = p;
+    }
+    closeArea();
+    el("path", { class: "area", d: area }, svg);
+    el("path", { class: "line", d }, svg);
+
+    const cross = el("line", { class: "crosshair", y1: m.top, y2: m.top + ih, visibility: "hidden" }, svg);
+    const dot = el("circle", { class: "dot", r: 5, visibility: "hidden" }, svg);
+    const hit = el("rect", { x: m.left, y: 0, width: iw, height: H, fill: "transparent" }, svg);
+
+    const tip = document.createElement("div");
+    tip.className = "tooltip";
+    const strong = document.createElement("strong");
+    const when = document.createElement("span");
+    tip.append(strong, when);
+
+    function show(evt) {
+      const rect = svg.getBoundingClientRect();
+      const px = ((evt.clientX - rect.left) / rect.width) * W;
+      const t = x0 + ((px - m.left) / iw) * (x1 - x0);
+      let best = pts[0];
+      for (const p of pts) if (Math.abs(p.at - t) < Math.abs(best.at - t)) best = p;
+      const x = sx(best.at), y = sy(best[field]);
+      cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.setAttribute("visibility", "visible");
+      dot.setAttribute("cx", x); dot.setAttribute("cy", y); dot.setAttribute("visibility", "visible");
+      strong.textContent = num(best[field], field === "temperature_c" ? 1 : 0) + " " + unit;
+      when.textContent = fmtFull(best.at);
+      tip.style.display = "block";
+      const scale = rect.width / W;
+      const left = 16 + x * scale;
+      tip.style.left = Math.min(left + 12, box.clientWidth - tip.offsetWidth - 8) + "px";
+      tip.style.top = (40 + y * scale - tip.offsetHeight - 10) + "px";
+    }
+    function hide() {
+      cross.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); tip.style.display = "none";
+    }
+    hit.addEventListener("pointermove", show);
+    hit.addEventListener("pointerdown", show);
+    hit.addEventListener("pointerleave", hide);
+
+    box.append(svg, tip);
+  }
+
+  function renderTable() {
+    const body = $("rows");
+    body.textContent = "";
+    for (const r of readings.slice(-200).reverse()) {
+      const tr = document.createElement("tr");
+      const cells = [fmtFull(r.at), num(r.soil_percent), num(r.soil_mv), r.soil_wet === null || r.soil_wet === undefined ? "–" : r.soil_wet ? "wet" : "dry", num(r.temperature_c, 1), num(r.humidity, 0)];
+      for (const c of cells) { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }
+      body.appendChild(tr);
+    }
+  }
+
+  function renderAll() {
+    renderTiles(readings[readings.length - 1]);
+    document.querySelectorAll(".chart").forEach(renderChart);
+    renderTable();
+  }
+
+  async function refresh() {
+    try {
+      const res = await fetch("/api/history?hours=" + hours, { cache: "no-store" });
+      const data = await res.json();
+      readings = data.readings || [];
+      window.__intervalMs = data.interval_ms;
+      renderAll();
+    } catch (e) {
+      console.error("Planto refresh failed", e);
+      $("updated").textContent = "Can't reach the Pi – retrying…";
+    }
+  }
+
+  document.querySelectorAll("[data-hours]").forEach((b) =>
+    b.addEventListener("click", () => {
+      hours = Number(b.dataset.hours);
+      document.querySelectorAll("[data-hours]").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+      refresh();
+    })
+  );
+
+  $("sample-now").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    try { await fetch("/api/sample", { method: "POST" }); await refresh(); }
+    finally { e.target.disabled = false; }
+  });
+
+  let resizeTimer;
+  window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderAll, 150); });
+
+  refresh();
+  setInterval(refresh, 10000);
+})();
+</script>
+</body>
+</html>

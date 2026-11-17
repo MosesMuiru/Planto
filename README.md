@@ -17,6 +17,8 @@ KiCad 9 project: [`planto/plant/`](planto/plant/) — a Pi 5 HAT that sits on th
 | Status LED | Green LED + 330 Ω | GPIO23 (pin 16) — HIGH = on |
 | ADC alert/ready | ADS1115 ALERT/RDY, 10k pull-up | GPIO24 (pin 18) |
 
+![Soil moisture sensor pinout](docs/soil_sensor_pinout.png)
+
 - **Soil sensor** (J2, 4-pin 2.54 mm): `1 VCC  2 GND  3 DO  4 AO` — Handson Technology SSR1025 (FC-28 type resistive probe + LM393 board), run at 3.3 V.
   Power it only while reading (GPIO17 low for ~10–50 ms) to slow probe corrosion.
 - **Pump**: 5 V from the Pi's 5 V rail (keep it under ~1 A).

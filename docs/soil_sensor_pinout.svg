@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="560" viewBox="0 0 1080 560" font-family="DejaVu Sans, Arial, Helvetica, sans-serif">
+  <rect width="1080" height="560" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="40" y="48" font-size="26" font-weight="700" fill="#1a1a19">Soil moisture sensor pinout</text>
+  <text x="40" y="76" font-size="15" fill="#52514e">Handson Technology SSR1025 (FC-28 probe + LM393 board) → Planto / Raspberry Pi 5</text>
+
+  <!-- Probe -->
+  <g transform="translate(40,150)">
+    <rect x="0" y="0" width="70" height="40" rx="4" fill="#1f1f1f"/>
+    <path d="M6 40 L6 230 L18 260 L30 230 L30 40 Z" fill="#c9a227" stroke="#8a6d10" stroke-width="1.5"/>
+    <path d="M40 40 L40 230 L52 260 L64 230 L64 40 Z" fill="#c9a227" stroke="#8a6d10" stroke-width="1.5"/>
+    <text x="35" y="292" font-size="13" fill="#52514e" text-anchor="middle">probe</text>
+  </g>
+  <!-- probe wires to module -->
+  <path d="M95 160 C140 160, 150 205, 190 205" fill="none" stroke="#4a4a4a" stroke-width="3"/>
+  <path d="M95 175 C135 175, 150 235, 190 235" fill="none" stroke="#4a4a4a" stroke-width="3"/>
+
+  <!-- Module board -->
+  <rect x="190" y="130" width="230" height="250" rx="10" fill="#1e5aa8"/>
+  <circle cx="212" cy="152" r="7" fill="#ffffff" opacity="0.85"/>
+  <circle cx="212" cy="358" r="7" fill="#ffffff" opacity="0.85"/>
+  <!-- probe header on board -->
+  <rect x="190" y="195" width="16" height="50" fill="#1f1f1f"/>
+  <text x="214" y="210" font-size="11" fill="#ffffff">+</text>
+  <text x="214" y="242" font-size="11" fill="#ffffff">−</text>
+  <!-- potentiometer -->
+  <rect x="240" y="150" width="56" height="56" rx="4" fill="#3d7fd6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="268" cy="178" r="16" fill="#e8eef8"/>
+  <path d="M260 178 H276 M268 170 V186" stroke="#1e5aa8" stroke-width="3"/>
+  <text x="268" y="222" font-size="11" fill="#ffffff" text-anchor="middle">sensitivity</text>
+  <!-- LM393 -->
+  <rect x="240" y="262" width="56" height="34" rx="2" fill="#1f1f1f"/>
+  <text x="268" y="284" font-size="11" fill="#d0d0d0" text-anchor="middle">LM393</text>
+  <!-- LEDs -->
+  <rect x="320" y="160" width="18" height="10" rx="2" fill="#ff5a4a"/>
+  <text x="329" y="186" font-size="10" fill="#ffffff" text-anchor="middle">PWR</text>
+  <rect x="320" y="300" width="18" height="10" rx="2" fill="#4cd06a"/>
+  <text x="329" y="326" font-size="10" fill="#ffffff" text-anchor="middle">DO</text>
+
+  <!-- Header pins (board edge) -->
+  <g font-size="15" font-weight="700" fill="#ffffff" text-anchor="end">
+    <text x="392" y="200">VCC</text>
+    <text x="392" y="240">GND</text>
+    <text x="392" y="280">DO</text>
+    <text x="392" y="320">AO</text>
+  </g>
+  <g fill="#c8c8c8" stroke="#6b6b6b" stroke-width="1">
+    <rect x="404" y="186" width="16" height="16"/>
+    <rect x="404" y="226" width="16" height="16"/>
+    <rect x="404" y="266" width="16" height="16"/>
+    <rect x="404" y="306" width="16" height="16"/>
+  </g>
+
+  <!-- Wires -->
+  <g fill="none" stroke-width="5" stroke-linecap="round">
+    <path d="M420 194 H470" stroke="#d62d20"/>
+    <path d="M420 234 H470" stroke="#1a1a19"/>
+    <path d="M420 274 H470" stroke="#e08a00"/>
+    <path d="M420 314 H470" stroke="#2a78d6"/>
+  </g>
+
+  <!-- Column headings -->
+  <text x="480" y="140" font-size="14" font-weight="700" fill="#1a1a19">Planto HAT (J2)</text>
+  <text x="800" y="140" font-size="14" font-weight="700" fill="#1a1a19">Breadboard → Pi 5 header</text>
+  <line x1="480" y1="152" x2="1040" y2="152" stroke="#d8d6cf"/>
+
+  <!-- Rows -->
+  <g font-size="14" fill="#1a1a19">
+    <!-- VCC -->
+    <text x="480" y="190" font-weight="700">J2 pin 1 · 3.3 V</text>
+    <text x="480" y="208" font-size="12" fill="#52514e">switched by GPIO17 (pin 11), LOW = on</text>
+    <text x="800" y="190" font-weight="700">Pin 1 · 3.3 V</text>
+    <text x="800" y="208" font-size="12" fill="#52514e">or pin 17</text>
+
+    <!-- GND -->
+    <text x="480" y="236" font-weight="700">J2 pin 2 · GND</text>
+    <text x="800" y="236" font-weight="700">Pin 6 · GND</text>
+    <text x="800" y="254" font-size="12" fill="#52514e">or 9, 14, 20, 25, 30, 34, 39</text>
+
+    <!-- DO -->
+    <text x="480" y="270" font-weight="700">J2 pin 3 · DO → 1 kΩ → GPIO27</text>
+    <text x="480" y="288" font-size="12" fill="#52514e">LOW = wetter than the knob setting</text>
+    <text x="800" y="270" font-weight="700">Pin 13 · GPIO27</text>
+    <text x="800" y="288" font-size="12" fill="#52514e">digital wet / dry</text>
+
+    <!-- AO -->
+    <text x="480" y="310" font-weight="700">J2 pin 4 · AO → ADS1115 AIN0</text>
+    <text x="480" y="328" font-size="12" fill="#52514e">I²C 0x48 on pins 3 (SDA) / 5 (SCL)</text>
+    <text x="800" y="310" font-weight="700">ADS1115 A0</text>
+    <text x="800" y="328" font-size="12" fill="#52514e">Pi has no analog input — use an ADC</text>
+  </g>
+
+  <!-- ADS1115 breakout note -->
+  <rect x="800" y="350" width="230" height="78" rx="8" fill="#f4f3ef" stroke="#d8d6cf"/>
+  <g font-size="12" fill="#1a1a19">
+    <text x="814" y="372" font-weight="700">ADS1115 breakout wiring</text>
+    <text x="814" y="390">VDD → pin 1 · GND → pin 9</text>
+    <text x="814" y="406">SDA → pin 3 · SCL → pin 5</text>
+    <text x="814" y="422">ADDR → GND (address 0x48)</text>
+  </g>
+
+  <!-- Footer notes -->
+  <rect x="40" y="460" width="1000" height="70" rx="8" fill="#fdf1d6"/>
+  <g font-size="14" fill="#5c3d00">
+    <text x="58" y="488" font-weight="700">⚠ Power the sensor from 3.3 V, never 5 V.</text>
+    <text x="58" y="510">At 5 V the DO/AO outputs can exceed 3.3 V and damage the Pi's GPIO. AO voltage rises as the soil dries.</text>
+  </g>
+</svg>

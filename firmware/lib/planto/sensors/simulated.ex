@@ -14,9 +14,11 @@ defmodule Planto.Sensors.Simulated do
     mv = if mv > 2700, do: 1100, else: mv + :rand.uniform(40)
     t = System.system_time(:second) / 600
 
+    analog? = Application.get_env(:planto, :soil_analog, true)
+
     fields = %{
-      soil_mv: mv,
-      soil_percent: Moisture.percent(mv, cal[:dry_mv], cal[:wet_mv]),
+      soil_mv: if(analog?, do: mv),
+      soil_percent: if(analog?, do: Moisture.percent(mv, cal[:dry_mv], cal[:wet_mv])),
       soil_wet: mv < 2200,
       temperature_c: Float.round(24 + 3 * :math.sin(t) + :rand.uniform() - 0.5, 1),
       humidity: Float.round(55 - 10 * :math.sin(t) + :rand.uniform(), 1),

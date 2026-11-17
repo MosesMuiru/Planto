@@ -136,7 +136,7 @@
       <div class="value" id="soil-pct">–</div>
       <div id="soil-status"></div>
     </div>
-    <div class="tile">
+    <div class="tile" id="tile-mv">
       <div class="label">Soil sensor voltage</div>
       <div class="value" id="soil-mv">–</div>
       <div class="sub">Higher = drier</div>
@@ -164,6 +164,9 @@
   <section class="charts">
     <div class="chart wide" data-field="soil_percent" data-unit="%" data-min="0" data-max="100">
       <h2>Soil moisture <span class="unit">%</span></h2>
+    </div>
+    <div class="chart wide" data-field="soil_wet_num" data-unit="" data-min="-0.2" data-max="1.2" data-labels="Dry,Wet" hidden>
+      <h2>Soil wet / dry <span class="unit">digital output (DO)</span></h2>
     </div>
     <div class="chart" data-field="temperature_c" data-unit="°C">
       <h2>Temperature <span class="unit">°C</span></h2>
@@ -215,7 +218,12 @@
 
   function renderTiles(r) {
     if (!r) return;
-    setValue("soil-pct", num(r.soil_percent), "%");
+    if (r.soil_percent == null && r.soil_wet != null) {
+      $("soil-pct").textContent = r.soil_wet ? "Wet" : "Dry";
+    } else {
+      setValue("soil-pct", num(r.soil_percent), "%");
+    }
+    $("tile-mv").hidden = r.soil_mv == null;
     setValue("soil-mv", num(r.soil_mv), " mV");
     setValue("temp", num(r.temperature_c, 1), "°C");
     setValue("hum", num(r.humidity, 0), "%");
@@ -250,6 +258,7 @@
   function renderChart(box) {
     const field = box.dataset.field;
     const unit = box.dataset.unit;
+    const labels = box.dataset.labels ? box.dataset.labels.split(",") : null;
     box.querySelectorAll("svg, .empty, .tooltip").forEach((n) => n.remove());
 
     const pts = readings.filter((r) => r[field] !== null && r[field] !== undefined);
@@ -282,12 +291,12 @@
     svg.style.height = H + "px";
 
     const axis = el("g", { class: "axis" }, svg);
-    for (let i = 0; i <= 4; i++) {
-      const v = y0 + ((y1 - y0) * i) / 4;
+    const yTicks = labels ? [0, 1] : [0, 1, 2, 3, 4].map((i) => y0 + ((y1 - y0) * i) / 4);
+    for (const v of yTicks) {
       const y = sy(v);
       el("line", { class: "gridline", x1: m.left, x2: W - m.right, y1: y, y2: y }, axis);
       const t = el("text", { x: m.left - 6, y: y + 4, "text-anchor": "end" }, axis);
-      t.textContent = Math.round(v);
+      t.textContent = labels ? labels[v] : Math.round(v);
     }
     for (let i = 0; i <= 4; i++) {
       const t = x0 + ((x1 - x0) * i) / 4;
@@ -301,9 +310,11 @@
     const closeArea = () => { if (segStart !== null) area += `L${sx(prev.at)},${sy(y0)}L${sx(segStart)},${sy(y0)}Z`; };
     for (const p of pts) {
       const cmd = !prev || p.at - prev.at > gap ? "M" : "L";
+      // Wet/dry is a state, so draw it as steps rather than a slope.
+      const seg = cmd === "L" && labels ? `H${sx(p.at).toFixed(1)}V${sy(p[field]).toFixed(1)}` : `${cmd}${sx(p.at).toFixed(1)},${sy(p[field]).toFixed(1)}`;
       if (cmd === "M") { closeArea(); segStart = p.at; area += `M${sx(p.at)},${sy(p[field])}`; }
-      else area += `L${sx(p.at)},${sy(p[field])}`;
-      d += `${cmd}${sx(p.at).toFixed(1)},${sy(p[field]).toFixed(1)}`;
+      else area += seg;
+      d += seg;
       prev = p;
     }
     closeArea();
@@ -329,7 +340,7 @@
       const x = sx(best.at), y = sy(best[field]);
       cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.setAttribute("visibility", "visible");
       dot.setAttribute("cx", x); dot.setAttribute("cy", y); dot.setAttribute("visibility", "visible");
-      strong.textContent = num(best[field], field === "temperature_c" ? 1 : 0) + " " + unit;
+      strong.textContent = labels ? labels[best[field]] : num(best[field], field === "temperature_c" ? 1 : 0) + " " + unit;
       when.textContent = fmtFull(best.at);
       tip.style.display = "block";
       const scale = rect.width / W;
@@ -360,7 +371,11 @@
 
   function renderAll() {
     renderTiles(readings[readings.length - 1]);
-    document.querySelectorAll(".chart").forEach(renderChart);
+    // Show the % chart when an ADS1115 is fitted, otherwise the wet/dry chart.
+    const hasPct = readings.some((r) => r.soil_percent != null);
+    document.querySelector('[data-field="soil_percent"]').hidden = !hasPct;
+    document.querySelector('[data-field="soil_wet_num"]').hidden = hasPct;
+    document.querySelectorAll(".chart:not([hidden])").forEach(renderChart);
     renderTable();
   }
 
@@ -368,7 +383,7 @@
     try {
       const res = await fetch("/api/history?hours=" + hours, { cache: "no-store" });
       const data = await res.json();
-      readings = data.readings || [];
+      readings = (data.readings || []).map((r) => ({ ...r, soil_wet_num: r.soil_wet == null ? null : r.soil_wet ? 1 : 0 }));
       window.__intervalMs = data.interval_ms;
       renderAll();
     } catch (e) {

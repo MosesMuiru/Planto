@@ -25,6 +25,9 @@ config :planto,
   history_size: 2880,
   i2c_bus: "i2c-1",
   adc_address: 0x48,
+  # true  = read the soil sensor's AO through an ADS1115 (moisture %)
+  # false = digital only: the DO pin gives wet/dry (no ADC needed)
+  soil_analog: false,
   pins: [soil_power: "GPIO17", soil_do: "GPIO27", dht: "GPIO4"],
   # Soil sensor calibration in millivolts at 3.3 V supply. Measure your own:
   # dry_mv = probe in dry soil/air, wet_mv = probe in water.

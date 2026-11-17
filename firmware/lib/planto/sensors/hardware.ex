@@ -7,6 +7,8 @@ defmodule Planto.Sensors.Hardware do
   * Soil VCC -> switched by GPIO17 (LOW = on) through the P-FET on the HAT
   * DHT11    -> GPIO4, decoded from GPIO edge timestamps (see Planto.DHT11)
 
+  With `soil_analog: false` only the DO pin is used (wet/dry, no ADS1115).
+
   Any part that is missing (for example no ADS1115 on a breadboard) is
   reported in `errors` and its fields are nil; the rest keep working.
   """
@@ -22,7 +24,11 @@ defmodule Planto.Sensors.Hardware do
     pins = Keyword.fetch!(cfg, :pins)
 
     state = %{
-      i2c: open(:i2c, fn -> Circuits.I2C.open(cfg[:i2c_bus]) end),
+      soil_analog: Keyword.get(cfg, :soil_analog, true),
+      i2c:
+        if(Keyword.get(cfg, :soil_analog, true),
+          do: open(:i2c, fn -> Circuits.I2C.open(cfg[:i2c_bus]) end)
+        ),
       adc_address: cfg[:adc_address],
       soil_power:
         open(:soil_power, fn ->
@@ -86,6 +92,7 @@ defmodule Planto.Sensors.Hardware do
   defp read_soil_do(%{soil_do: nil}), do: {:error, :gpio_unavailable}
   defp read_soil_do(%{soil_do: gpio}), do: {:ok, Circuits.GPIO.read(gpio) == 0}
 
+  defp read_soil_mv(%{soil_analog: false}), do: {:ok, nil}
   defp read_soil_mv(%{i2c: nil}), do: {:error, :i2c_unavailable}
 
   defp read_soil_mv(%{i2c: bus, adc_address: address}),

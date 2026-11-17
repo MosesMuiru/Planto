@@ -28,7 +28,10 @@ KiCad 9 project: [`planto/plant/`](planto/plant/) — a Pi 5 HAT that sits on th
 
 Nerves project in [`firmware/`](firmware/), target `rpi5`.
 
-- Reads the soil sensor (ADS1115 AIN0 + DO pin) and the DHT11 every 30 s.
+- Reads the soil sensor and the DHT11 every 30 s. With `soil_analog: false`
+  (the default, in `config/config.exs`) only the sensor's DO pin is used and the
+  dashboard shows wet/dry; set it to `true` once an ADS1115 is wired to AO to get
+  a moisture %.
 - Serves a live dashboard at **http://planto.local** (port 80): current values,
   24 h charts for soil moisture, temperature and humidity, and a readings table.
 - JSON API: `GET /api/latest`, `GET /api/history?hours=N`, `POST /api/sample`.
@@ -44,6 +47,8 @@ export MIX_TARGET=rpi5
 mix deps.get
 NERVES_WIFI_SSID='your-network' NERVES_WIFI_PSK='your-password' mix firmware
 mix burn            # writes the microSD card (asks which drive / for sudo)
+# later updates over Wi-Fi, no SD card needed:
+mix upload planto.local      # or the Pi's IP address
 ```
 
 Wi-Fi details are read at build time and are never stored in git.

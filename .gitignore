@@ -1,0 +1,15 @@
+# KiCad
+*.lck
+*-backups/
+fp-info-cache
+*.kicad_prl
+_autosave-*
+*.bak
+\#auto_saved_files#
+
+# Nerves / Elixir
+/_build/
+/deps/
+/.nerves/
+*.fw
+erl_crash.dump

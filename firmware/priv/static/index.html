@@ -383,7 +383,9 @@
     try {
       const res = await fetch("/api/history?hours=" + hours, { cache: "no-store" });
       const data = await res.json();
-      readings = (data.readings || []).map((r) => ({ ...r, soil_wet_num: r.soil_wet == null ? null : r.soil_wet ? 1 : 0 }));
+      readings = (data.readings || [])
+        .map((r) => ({ ...r, soil_wet_num: r.soil_wet == null ? null : r.soil_wet ? 1 : 0 }))
+        .sort((a, b) => a.at - b.at);
       window.__intervalMs = data.interval_ms;
       renderAll();
     } catch (e) {

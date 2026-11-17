@@ -3,6 +3,10 @@
 Smart planting system built on a **Raspberry Pi 5** running **[Nerves](https://nerves-project.org/)** (Elixir).
 It monitors soil moisture and air temperature/humidity (DHT11), waters the plant with a small pump, and streams/snaps images from a Pi camera.
 
+![Planto dashboard](docs/dashboard.png)
+
+*Live dashboard served by the Pi at http://planto.local (shown here with simulated readings).*
+
 ## Hardware
 
 KiCad 9 project: [`planto/plant/`](planto/plant/) — a Pi 5 HAT that sits on the 40-pin header.
